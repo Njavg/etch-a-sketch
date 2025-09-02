@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Malla dinámica con Flexbox y JS</title>
+<style>
+  #grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    width: 960px; /* ancho fijo total */
+    border: 1px solid #333;
+  }
+
+  .grid-square {
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    margin: 0;
+  }
+
+  /* Botón arriba con algo de estilo */
+  #resize-btn {
+    margin-bottom: 10px;
+    padding: 8px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<button id="resize-btn">Cambiar tamaño de cuadrícula</button>
+<div id="grid-container"></div>
+
+<script>
+  const container = document.getElementById('grid-container');
+  const btn = document.getElementById('resize-btn');
+  const totalWidth = 960;
+
+  function crearCuadricula(lados) {
+    container.innerHTML = ''; // Limpiar cuadrícula previa
+    const totalSquares = lados * lados;
+    const squareSize = totalWidth / lados;
+
+    for (let i = 0; i < totalSquares; i++) {
+      const square = document.createElement('div');
+      square.classList.add('grid-square');
+      square.style.width = square.style.height = squareSize + 'px';
+
+      // Evento para efecto rastro
+    square.addEventListener('mouseenter', () => {
+        let currentColor = square.style.backgroundColor;
+        if (!currentColor) {
+        // Generar y asignar un color RGB aleatorio
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            square.style.backgroundColor = `rgb(${r},${g},${b})`;
+            square.dataset.darkLevel = 0; // sin oscurecer
+        } else {
+        // Si ya tiene color, oscurecer en 10%
+            let darkLevel = parseInt(square.dataset.darkLevel) || 0;
+            if (darkLevel < 10) {
+                darkLevel++;
+                square.dataset.darkLevel = darkLevel;
+                // Obtener valores RGB actuales
+                const rgb = currentColor.match(/\d+/g).map(Number);
+                // Oscurecer cada canal un 10%
+                const newRgb = rgb.map(c => Math.floor(c * (1 - 0.1 * darkLevel)));
+                square.style.backgroundColor = `rgb(${newRgb[0]},${newRgb[1]},${newRgb[2]})`;
+                }
+            }
+    });
+
+      container.appendChild(square);
+    }
+  }
+
+  btn.addEventListener('click', () => {
+    let lados = parseInt(prompt('Introduce el número de cuadrados por lado (máximo 100):'));
+    if (isNaN(lados) || lados < 1) {
+      alert('Por favor, introduce un número válido mayor o igual a 1.');
+      return;
+    }
+    if (lados > 100) {
+      alert('El número máximo permitido es 100.');
+      lados = 100;
+    }
+    crearCuadricula(lados);
+  });
+
+  // Crear cuadrícula inicial 16x16
+  crearCuadricula(16);
+</script>
+
+</body>
+</html>
